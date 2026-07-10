@@ -488,9 +488,17 @@
       }
 
       function openReport(html) {
-        document.open("text/html", "replace");
-        document.write(html);
-        document.close();
+        const reportDocument = new DOMParser().parseFromString(html, "text/html");
+        document.title = reportDocument.title || "Secure Café · Owner Review";
+        document.documentElement.lang = reportDocument.documentElement.lang || "en";
+        document.head.replaceChildren(
+          ...Array.from(reportDocument.head.childNodes, node => document.importNode(node, true))
+        );
+        document.body.replaceChildren(
+          ...Array.from(reportDocument.body.childNodes, node => document.importNode(node, true))
+        );
+        history.replaceState(null, document.title, location.pathname);
+        window.scrollTo({ top: 0, behavior: "instant" });
       }
 
       function registerFailure() {
